@@ -14,10 +14,13 @@ public class GameManager : MonoBehaviour
     public GameObject GrowUI;
     public GameObject playUI;
     public Image slider;
+    [SerializeField] GameObject floor;
     //private float targetProgress = 0;
     public float fillSpeed = 0.5f;
     public Text progress;
     public bool play = false;
+    public float floorLenght;
+    public float floorWidth;
     // Start is called before the first frame update
     private void Awake()
 	{
@@ -26,6 +29,8 @@ public class GameManager : MonoBehaviour
 	void Start()
     {
         playUI.SetActive(true);
+        floorWidth = floor.transform.localScale.x/2;
+        floorLenght = floor.transform.localScale.z;
     }
     public void Play()
 	{

@@ -48,6 +48,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _number: 0
   _textMesh: {fileID: 5185293123379610996}
+  direction: 3
+  floorPrefab: {fileID: 6231878984053238026, guid: dc0fbcfece355402785164f10747ae61, type: 3}
 --- !u!136 &7289993378465738099
 CapsuleCollider:
   m_ObjectHideFlags: 0

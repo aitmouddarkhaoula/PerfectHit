@@ -8,13 +8,16 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float mSpeed = 25;
     [SerializeField] float bodySpeed = 10;
     [SerializeField] int gap = 2;
-    [SerializeField] int n = 1;
+    [SerializeField] int n = 4;
     public int force;
     public TextMesh count;
     float touchRightVal;
     //[SerializeField] Obstacles _obstacle;
     [SerializeField] Ball _ball;
     public GameObject BodyPrefab;
+    Vector2 startPosition;
+    Vector2 newPosition;
+    public Floor floor;
 
     public List<GameObject> _body = new List<GameObject>();
     private List<Vector3> _positionsHistory = new List<Vector3>();
@@ -25,6 +28,7 @@ public class PlayerController : MonoBehaviour {
     void Start() {
         Snake();
 
+
     }
 	
 
@@ -33,13 +37,13 @@ public class PlayerController : MonoBehaviour {
         if(!GameManager.instance.play) {
             return;
         }
-        float n = 400f - 21f;
-        float k = transform.position.z - 21f;
+        float n = floor.floorLenght;
+        float k = transform.position.z;
         GameManager.instance.SetProgress(k / n);
         count.text = _body.Count + "";
         transform.position += transform.forward * mSpeed * Time.fixedDeltaTime;
         
-        if (transform.position.z == 100.1f)
+        if (transform.position.z >= 400)
         {
             print("win");
             GameManager.instance.ShowWinUI();
@@ -47,14 +51,57 @@ public class PlayerController : MonoBehaviour {
             Application.Quit();
 
         }
-        if (Input.GetKey(KeyCode.A))
+
+        bool left = false;
+        bool right = false;
+        /*if (Input.GetMouseButton(0))
+        {
+            Vector3 currentMousee = new Vector3(Input.mousePosition.x * 3.5f / Screen.width, transform.position.y, transform.position.z);
+            transform.position = currentMousee;
+        }
+
+        rd.velocity = new Vector3(0, 0, i);
+        if (Time.timeScale == 1)
+            i += 0.04f;*/
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            startPosition.x = Input.mousePosition.x ;
+        }
+        if (Input.GetMouseButton(0))
+        {
+            float newX = Input.mousePosition.x;
+            if (newX != startPosition.x)
+                newPosition.x = newX;
+            if (newPosition.x> startPosition.x)
+                right = true;
+            else if(newPosition.x < startPosition.x)
+                left = true;
+
+            startPosition = newPosition;
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            startPosition = Vector2.zero;
+        }
+
+
+        if (left || Input.GetKey(KeyCode.A))
             {
-                transform.position -= transform.right * Time.fixedDeltaTime * force;
+            transform.position -= transform.right * Time.fixedDeltaTime * force;
             }
-        if (Input.GetKey(KeyCode.D))
+        if (right || Input.GetKey(KeyCode.D))
             {
                 transform.position += transform.right * Time.fixedDeltaTime * force;
             }
+        if (transform.position.x > floor.floorWidth)
+        {
+            transform.position = new Vector3(floor.floorWidth, transform.position.y, transform.position.z);
+        }
+        if(transform.position.x < -floor.floorWidth)
+        {
+            transform.position = new Vector3(-floor.floorWidth, transform.position.y, transform.position.z);
+        }
 
         if (Input.touchCount > 0)
         {
@@ -80,7 +127,7 @@ public class PlayerController : MonoBehaviour {
 
             index++;
         }
-        if (_body.Count == 0)
+        if (_body.Count == 0 && transform.position.z >= 40)
         {
             GameManager.instance.play = false;
             GameManager.instance.ShowLoseUI();
@@ -110,7 +157,6 @@ public class PlayerController : MonoBehaviour {
             ball.transform.position = transform.position - Vector3.forward * _body.Count;
             ball.Grow(this);
             GameManager.instance.ShowGrowUI();
-            
         }
         if (other.gameObject.name == "End")
         {
